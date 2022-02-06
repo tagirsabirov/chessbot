@@ -2,8 +2,8 @@ import chess
 board = chess.Board()
 legal_moves = list(board.legal_moves)
 
-class evaluate:
-    def evaluate_board():
+class Evaluate:
+    def evaluate_board(self):
         
         if board.is_checkmate():
             if board.turn:
