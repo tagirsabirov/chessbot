@@ -15,33 +15,27 @@ def minimax(board, depth, maximizing_player):
 
     if depth == 0 or board.is_game_over():
         #Only calculate the evaluation once per node, at the lowest depth of the tree
-        return None, Evaluate.evaluate_board(board)
+        return Evaluate.evaluate_board(board)
          
     if maximizing_player:
         #value is the board value
-        max_value = -float("inf")
+        value = -float("inf")
         for move in board.legal_moves:
             # Calculate all possible moves
             board.push(move)
             # Calculate a depth further recursively
             #choosing the largest value to maximize
-            value = minimax(board, depth - 1, False)
-            if value > max_value:
-                max_value = value
-                best_move = move
+            value = max(value, minimax(board, depth - 1, False))
             board.pop()
-            return best_move, max_value
+            return value
     #If it's not your move
     else:
-        min_value = float("inf")
+        value = float("inf")
         for move in board.legal_moves:
             board.push(move)
-            value = minimax(board, depth - 1, False)
-            if value < min_value:
-                min_value = value
-                best_move = move
+            value = min(value, minimax(board, depth - 1, True))
             board.pop()
-            return best_move, min_value
+            return value
 
 board.push_san("e4")
 board.push_san("e5")
