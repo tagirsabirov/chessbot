@@ -27,7 +27,7 @@ def minimax(board, depth, maximizing_player):
             #choosing the largest value to maximize
             value = max(value, minimax(board, depth - 1, False))
             board.pop()
-            return value
+        return value
     #If it's not your move
     else:
         value = float("inf")
@@ -35,7 +35,7 @@ def minimax(board, depth, maximizing_player):
             board.push(move)
             value = min(value, minimax(board, depth - 1, True))
             board.pop()
-            return value
+        return value
 
 board.push_san("e4")
 board.push_san("e5")
@@ -45,5 +45,5 @@ board.push_san("Qg5")
 
 print("Board evaluation: " + str(Evaluate.evaluate_board(board)))
 
-print("Minimax evaluation: " + str(minimax(board, 10, True)))
+print("Minimax evaluation: " + str(minimax(board, 3, False)))
 
