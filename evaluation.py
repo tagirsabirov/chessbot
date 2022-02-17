@@ -45,11 +45,15 @@ class Evaluate:
         kingsq = kingsq + sum([-kingstable[chess.square_mirror(i)] 
                                         for i in board.pieces(chess.KING, chess.BLACK)])
         
-        eval = material + pawnsq + knightsq + bishopsq+ rooksq+ queensq + kingsq
-        if board.turn:
-            return eval
-        else:
-            return -eval
+        # eval = material + pawnsq + knightsq + bishopsq + rooksq + queensq + kingsq
+        # if board.turn:
+        #     return eval
+        # else:
+        #     return -eval
+
+
+        eval = material + pawnsq + knightsq + bishopsq + rooksq + queensq + kingsq
+        return eval
 
 pawntable = [
  0,  0,  0,  0,  0,  0,  0,  0,
