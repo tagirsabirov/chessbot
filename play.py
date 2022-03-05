@@ -1,5 +1,4 @@
 import chess
-from evaluation import Evaluate
 from bot import chessbot
 board = chess.Board()
 
@@ -14,5 +13,4 @@ def play():
         board.push(x[1])
     else:
         print("Game Over")
-
 play()

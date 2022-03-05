@@ -1,5 +1,12 @@
 import chess
 from evaluation import Evaluate
+from tensorflow import keras
+import numpy as np
+model = keras.models.load_model('NNUE-model.h5')
+
+def split_dims(board):
+  # this is the 3d matrix
+  board3d = np.zeros((14, 8, 8), dtype=np.int8)
 
 # create board object
 board = chess.Board()
@@ -12,7 +19,11 @@ class chessbot:
 
         if depth == 0 or board.is_game_over():
             #Only calculate the evaluation once per node, at the lowest depth of the tree
-            return Evaluate.evaluate_board(board), None
+            # return Evaluate.evaluate_board(board), None
+            board3d = split_dims(board)
+            board3d = np.expand_dims(board3d, 0)
+            board3d = np.asarray(board3d).astype(np.float32)
+            return model.predict(board3d)[0][0]
         if maximizing_player:
             #value is the board value
             max_value = float("-inf")
