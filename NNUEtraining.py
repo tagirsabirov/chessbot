@@ -1,7 +1,7 @@
 import chess
 import chess.engine
 import random
-import numpy
+import numpy as np
 import tensorflow.keras.models as models
 import tensorflow.keras.layers as layers
 import tensorflow.keras.utils as utils
@@ -32,6 +32,7 @@ def stockfish(board, depth):
 
 board = random_board()
 board
+
 squares_index = {
   'a': 0,
   'b': 1,
@@ -49,36 +50,36 @@ def square_to_index(square):
   letter = chess.square_name(square)
   return 8 - int(letter[1]), squares_index[letter[0]]
 
+class split:
+  def split_dims(board):
+    # this is the 3d matrix
+    board3d = np.zeros((14, 8, 8), dtype=np.int8)
 
-def split_dims(board):
-  # this is the 3d matrix
-  board3d = numpy.zeros((14, 8, 8), dtype=numpy.int8)
+    # here we add the pieces's view on the matrix
+    for piece in chess.PIECE_TYPES:
+      for square in board.pieces(piece, chess.WHITE):
+        idx = np.unravel_index(square, (8, 8))
+        board3d[piece - 1][7 - idx[0]][idx[1]] = 1
+      for square in board.pieces(piece, chess.BLACK):
+        idx = np.unravel_index(square, (8, 8))
+        board3d[piece + 5][7 - idx[0]][idx[1]] = 1
 
-  # here we add the pieces's view on the matrix
-  for piece in chess.PIECE_TYPES:
-    for square in board.pieces(piece, chess.WHITE):
-      idx = numpy.unravel_index(square, (8, 8))
-      board3d[piece - 1][7 - idx[0]][idx[1]] = 1
-    for square in board.pieces(piece, chess.BLACK):
-      idx = numpy.unravel_index(square, (8, 8))
-      board3d[piece + 5][7 - idx[0]][idx[1]] = 1
+    # add attacks and valid moves too
+    # so the network knows what is being attacked
+    aux = board.turn
+    board.turn = chess.WHITE
+    for move in board.legal_moves:
+        i, j = square_to_index(move.to_square)
+        board3d[12][i][j] = 1
+    board.turn = chess.BLACK
+    for move in board.legal_moves:
+        i, j = square_to_index(move.to_square)
+        board3d[13][i][j] = 1
+    board.turn = aux
 
-  # add attacks and valid moves too
-  # so the network knows what is being attacked
-  aux = board.turn
-  board.turn = chess.WHITE
-  for move in board.legal_moves:
-      i, j = square_to_index(move.to_square)
-      board3d[12][i][j] = 1
-  board.turn = chess.BLACK
-  for move in board.legal_moves:
-      i, j = square_to_index(move.to_square)
-      board3d[13][i][j] = 1
-  board.turn = aux
+    return board3d
 
-  return board3d
-
-split_dims(board)
+  split_dims(board)
 
 
 def build_model(conv_size, conv_depth):
@@ -118,9 +119,9 @@ def build_model_residual(conv_size, conv_depth):
 
 
 def get_dataset():
-	container = numpy.load('dataset.npz')
+	container = np.load('dataset.npz')
 	b, v = container['b'], container['v']
-	v = numpy.asarray(v / abs(v).max() / 2 + 0.5, dtype=numpy.float32) # normalization (0 - 1)
+	v = np.asarray(v / abs(v).max() / 2 + 0.5, dtype=np.float32) # normalization (0 - 1)
 	return b, v
 
 
