@@ -1,9 +1,8 @@
-from asyncio.windows_events import NULL
 import chess
 from evaluation import Evaluate
 from tensorflow import keras
 import numpy as np
-model = keras.models.load_model('NNUE-model.h5')
+model = keras.models.load_model('NN-model.h5')
 
 squares_index = {
   'a': 0,

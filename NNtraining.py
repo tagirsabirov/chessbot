@@ -84,14 +84,14 @@ class split:
 
 def build_model(conv_size, conv_depth):
   board3d = layers.Input(shape=(14, 8, 8))
-
   # adding the convolutional layers
   x = board3d
   for _ in range(conv_depth):
     x = layers.Conv2D(filters=conv_size, kernel_size=3, padding='same', activation='relu', data_format='channels_first')(x)
-  x = layers.Flatten()(x)
-  x = layers.Dense(64, 'relu')(x)
-  x = layers.Dense(1, 'sigmoid')(x)
+    x = layers.Flatten()(x)
+    x = layers.Dense(64, 'relu')(x)
+    x = layers.Dense(32, 'relu')(x)
+    x = layers.Dense(1, 'sigmoid')(x)
 
   return models.Model(inputs=board3d, outputs=x)
 
@@ -139,4 +139,4 @@ model.fit(x_train, y_train,
           callbacks=[callbacks.ReduceLROnPlateau(monitor='loss', patience=10),
                      callbacks.EarlyStopping(monitor='loss', patience=15, min_delta=1e-4)])
 
-model.save('NNUE-model.h5')
+model.save('NN-model.h5')
