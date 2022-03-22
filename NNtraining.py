@@ -1,6 +1,7 @@
 import chess
 import chess.engine
 import random
+from matplotlib import container
 import numpy as np
 import tensorflow.keras.models as models
 import tensorflow.keras.layers as layers
@@ -22,13 +23,6 @@ def random_board(max_depth=200):
 
   return board
 
-
-# this function will create our f(x) (score)
-def stockfish(board, depth):
-  with chess.engine.SimpleEngine.popen_uci('/content/stockfish') as sf:
-    result = sf.analyse(board, chess.engine.Limit(depth=depth))
-    score = result['score'].white().score()
-    return score
 
 board = random_board()
 board
@@ -88,15 +82,14 @@ def build_model(conv_size, conv_depth):
   x = board3d
   for _ in range(conv_depth):
     x = layers.Conv2D(filters=conv_size, kernel_size=3, padding='same', activation='relu', data_format='channels_first')(x)
-    x = layers.Flatten()(x)
-    x = layers.Dense(64, 'relu')(x)
-    x = layers.Dense(32, 'relu')(x)
-    x = layers.Dense(1, 'sigmoid')(x)
+  x = layers.Flatten()(x)
+  x = layers.Dense(64, 'relu')(x)
+  x = layers.Dense(32, 'relu')(x)
+  x = layers.Dense(1, 'sigmoid')(x)
 
   return models.Model(inputs=board3d, outputs=x)
 
-model = build_model(32, 4)
-# utils.plot_model(model, to_file='model_plot.png', show_shapes=True, show_layer_names=False)
+
 
 def build_model_residual(conv_size, conv_depth):
   board3d = layers.Input(shape=(14, 8, 8))
@@ -116,6 +109,25 @@ def build_model_residual(conv_size, conv_depth):
   x = layers.Dense(1, 'sigmoid')(x)
 
   return models.Model(inputs=board3d, outputs=x)
+
+def build_model_dense(size, depth):
+  #loss: 2.2135e-04 - val_loss: 4.7865e-04
+  board3d = layers.Input(shape=(14, 8, 8))
+  # adding the convolutional layers
+  x = board3d
+  for _ in range(depth):
+    x = layers.Dense(size, 'relu')(x)
+  x = layers.Flatten()(x)
+  x = layers.Dense(64, 'relu')(x)
+  x = layers.Dense(32, 'relu')(x)
+  x = layers.Dense(1, 'sigmoid')(x)
+
+  return models.Model(inputs=board3d, outputs=x)
+
+model = build_model_dense(64, 2)
+# model = build_model(32, 4)
+# model = build_model_dense(, 4)
+# utils.plot_model(model, to_file='model_plot.png', show_shapes=True, show_layer_names=False)
 
 
 def get_dataset():
@@ -139,4 +151,4 @@ model.fit(x_train, y_train,
           callbacks=[callbacks.ReduceLROnPlateau(monitor='loss', patience=10),
                      callbacks.EarlyStopping(monitor='loss', patience=15, min_delta=1e-4)])
 
-model.save('NN-model.h5')
+model.save('NN-model-dense.h5')
