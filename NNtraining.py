@@ -124,7 +124,7 @@ def build_model_dense(size, depth):
 
   return models.Model(inputs=board3d, outputs=x)
 
-model = build_model_dense(64, 2)
+model = build_model_dense(32, 2)
 # model = build_model(32, 4)
 # model = build_model_dense(, 4)
 # utils.plot_model(model, to_file='model_plot.png', show_shapes=True, show_layer_names=False)
